@@ -1,217 +1,177 @@
-
-- Appears as a **slave** on the AXI4-Lite bus
-- Appears as a **master** on the APB bus
-- Converts AXI4-Lite transactions into APB transfers
-- Converts APB responses into AXI4-Lite-compliant responses
-
-This architecture is described in:
-- ARM AMBA AXI4-Lite Specification
-- ARM AMBA APB Specification
-- AMD/Xilinx AXI to APB Bridge Product Guide
+# AXI4-Lite to APB Bridge  
+## Architecture, Motivation, and Design Documentation
 
 ---
 
-## 4. High-Level Transaction Flow
+## 1. Introduction
 
-1. AXI4-Lite master initiates a read or write transaction  
-2. Bridge accepts the request through the AXI slave interface  
-3. Transaction is buffered and sequenced internally  
-4. Bridge initiates a corresponding APB transfer  
-5. APB slave completes the transaction  
-6. Bridge captures APB response signals  
-7. Bridge returns an AXI4-Lite-compliant response  
+Modern System-on-Chip (SoC) designs integrate a wide variety of IP blocks with different performance, power, and complexity requirements. To interconnect these components efficiently, the ARM Advanced Microcontroller Bus Architecture (AMBA) family of protocols is widely adopted across the semiconductor industry.
+
+High-performance masters such as CPUs and DMA controllers commonly use **AXI4-Lite** for register-mapped control and configuration access. In contrast, low-speed peripherals such as GPIOs, UARTs, timers, and watchdogs are typically connected using the **Advanced Peripheral Bus (APB)**.
+
+Because AXI4-Lite and APB follow fundamentally different communication models, they cannot communicate directly. An **AXI4-Lite to APB bridge** is therefore required to translate transactions between these two protocols while maintaining full compliance with the AMBA specification.
 
 ---
 
-## 5. Internal Architectural Blocks and Their Roles
+## 2. Problem Statement
+
+AXI4-Lite and APB differ significantly in structure, timing, and signaling behavior. AXI4-Lite supports pipelined, multi-channel communication, whereas APB uses a single, sequential transfer mechanism. Without a bridge, AXI masters cannot safely access APB peripherals, leading to protocol violations and system integration failure.
+
+The purpose of the AXI4-Lite to APB bridge is to resolve these incompatibilities by performing protocol translation in a controlled and compliant manner.
 
 ---
 
-### 5.1 AXI Slave Interface
+## 3. Overview of AXI4-Lite and APB Protocols
 
-**Purpose:**  
-Terminates the AXI4-Lite protocol.
+### 3.1 AXI4-Lite Protocol Overview
 
-**Why it is needed:**  
-AXI4-Lite uses multiple independent channels with strict handshake rules. The bridge must fully comply with these rules before translating transactions.
+AXI4-Lite is a simplified subset of the AXI4 protocol intended for low-bandwidth, register-mapped communication. It uses five independent channels with separate address, data, and response paths. Each channel employs a VALID/READY handshake to control data transfer.
 
-**Responsibilities:**
-- Handle AW, W, AR, B, and R channels
-- Manage VALID/READY handshakes
-- Ensure AXI protocol correctness
-- Forward transaction intent internally
+Key characteristics:
+- Five independent channels (AW, W, B, AR, R)
+- Separate address and data phases
+- Pipelined operation
+- Single-beat transfers only (no bursts)
 
 ---
 
-### 5.2 AXI Write FSM
+### 3.2 APB Protocol Overview
 
-**Purpose:**  
-Reconstruct AXI write transactions into a single APB write request.
+APB is optimized for low-power, low-complexity peripherals. It uses a single shared bus with a simple two-phase transfer mechanism. APB transactions are non-pipelined and strictly ordered.
 
-**Why it is needed:**  
-- AXI4-Lite separates write address and write data
-- Their arrival order is not guaranteed
-- APB requires address, data, and control together
-
-**Function:**
-- Waits for both AW and W handshakes
-- Latches address, data, and write strobes
-- Issues a single APB write transaction
+Key characteristics:
+- Single bus interface
+- Two-phase transfer: SETUP and ACCESS
+- One transaction active at a time
+- Minimal control and response signaling
 
 ---
 
-### 5.3 AXI Read FSM
+## 4. Role of the AXI4-Lite to APB Bridge
 
-**Purpose:**  
-Manage AXI read requests and initiate APB reads.
+The AXI4-Lite to APB bridge performs protocol translation only and does not implement arbitration or data processing logic.
 
-**Why it is needed:**  
-AXI separates read address and read data phases, while APB completes the read before returning data.
+Functionally, the bridge behaves as:
 
-**Function:**
-- Accepts read address
-- Initiates APB read transfer
-- Waits for APB completion
-- Triggers AXI read response generation
+
+The bridge appears as a slave on the AXI4-Lite bus and as a master on the APB bus. It accepts AXI4-Lite transactions, converts them into APB transfers, and converts APB responses back into AXI4-Lite-compliant responses.
 
 ---
 
-### 5.4 Command FIFO
+## 5. High-Level Transaction Flow
 
-**Purpose:**  
-Decouple AXI pipelining from APB sequential behavior.
+### 5.1 Write Transaction Flow
 
-**Why it is needed:**  
-- AXI4-Lite supports back-to-back requests
-- APB supports only one active transfer
-- APB slaves may insert wait states
-
-**Function:**
-- Buffers pending transactions
-- Maintains ordering
-- Prevents unnecessary stalling of AXI master
+1. The AXI4-Lite master issues a write address on the AW channel.  
+2. The AXI4-Lite master issues write data on the W channel.  
+3. The bridge accepts and aligns the address and data internally.  
+4. The bridge initiates an APB write transfer.  
+5. The APB slave completes the transfer and returns status.  
+6. The bridge generates an AXI write response on the B channel.
 
 ---
 
-### 5.5 Address Decoder
+### 5.2 Read Transaction Flow
 
-**Purpose:**  
-Select the appropriate APB slave.
-
-**Why it is needed:**  
-- AXI uses a flat address space
-- APB requires one-hot slave selection (`PSELx`)
-
-**Function:**
-- Decodes address ranges
-- Asserts exactly one `PSEL` signal
+1. The AXI4-Lite master issues a read address on the AR channel.  
+2. The bridge initiates an APB read transfer.  
+3. The APB slave returns read data.  
+4. The bridge captures the read data.  
+5. The bridge generates an AXI read response on the R channel.
 
 ---
 
-### 5.6 APB Master FSM
+## 6. Internal Architecture and Block Descriptions
 
-**Purpose:**  
-Generate APB-compliant timing.
+### 6.1 AXI Slave Interface
 
-**Why it is needed:**  
-APB mandates a strict two-phase transfer:
-- **SETUP phase:** `PSEL = 1`, `PENABLE = 0`
-- **ACCESS phase:** `PSEL = 1`, `PENABLE = 1`, wait for `PREADY`
-
-**Function:**
-- Drives `PADDR`, `PWRITE`, `PWDATA`
-- Controls `PSELx` and `PENABLE`
-- Handles wait states
-- Completes APB transfers correctly
+The AXI slave interface terminates the AXI4-Lite protocol. It handles all AXI channels, manages VALID/READY handshakes, and ensures that incoming transactions comply with AXI4-Lite rules before passing them to internal logic.
 
 ---
 
-### 5.7 Response Generator
+### 6.2 AXI Write FSM
 
-**Purpose:**  
-Convert APB responses into AXI4-Lite responses.
-
-**Important:**  
-`PRDATA` from the APB slave is captured and processed in this block.
-
-**Why it is needed:**  
-APB provides:
-- `PRDATA`
-- `PREADY`
-- `PSLVERR`
-
-AXI4-Lite expects:
-- `RDATA`, `RRESP`, `RVALID` (read)
-- `BRESP`, `BVALID` (write)
-
-**Function:**
-- Latches `PRDATA` when `PREADY` is asserted
-- Maps `PSLVERR` to AXI response codes
-- Generates valid AXI response signals
+The AXI write finite state machine reconstructs write transactions by collecting write address and write data that arrive on independent AXI channels. Once both are available, it generates a single APB-compatible write request.
 
 ---
 
-## 6. Signal Summary
+### 6.3 AXI Read FSM
 
-### 6.1 AXI4-Lite Interface Signals
-
-**Write Address Channel**  
-`AWADDR`, `AWVALID`, `AWREADY`
-
-**Write Data Channel**  
-`WDATA`, `WSTRB`, `WVALID`, `WREADY`
-
-**Write Response Channel**  
-`BRESP`, `BVALID`, `BREADY`
-
-**Read Address Channel**  
-`ARADDR`, `ARVALID`, `ARREADY`
-
-**Read Data Channel**  
-`RDATA`, `RRESP`, `RVALID`, `RREADY`
+The AXI read finite state machine manages read requests by accepting read addresses, initiating APB read transactions, and coordinating the return of read data to the AXI master.
 
 ---
 
-### 6.2 APB Interface Signals
+### 6.4 Command FIFO
+
+The command FIFO buffers pending transactions to decouple the pipelined nature of AXI4-Lite from the non-pipelined nature of APB. It ensures correct ordering and prevents AXI back-pressure caused by APB wait states.
+
+---
+
+### 6.5 Address Decoder
+
+The address decoder maps the AXI address space to individual APB slaves. It asserts the appropriate one-hot PSEL signal based on the decoded address range.
+
+---
+
+### 6.6 APB Master FSM
+
+The APB master finite state machine generates APB-compliant timing. It drives the SETUP and ACCESS phases, controls PSEL and PENABLE, manages wait states using PREADY, and completes transfers according to the APB specification.
+
+---
+
+### 6.7 Response Generator
+
+The response generator converts APB response signals into AXI4-Lite responses. It captures PRDATA for read transactions, maps PSLVERR to AXI response codes, and asserts the appropriate AXI response signals (BVALID or RVALID).
+
+---
+
+## 7. Signal Summary
+
+### 7.1 AXI4-Lite Interface Signals
+
+- Write Address Channel: `AWADDR`, `AWVALID`, `AWREADY`
+- Write Data Channel: `WDATA`, `WSTRB`, `WVALID`, `WREADY`
+- Write Response Channel: `BRESP`, `BVALID`, `BREADY`
+- Read Address Channel: `ARADDR`, `ARVALID`, `ARREADY`
+- Read Data Channel: `RDATA`, `RRESP`, `RVALID`, `RREADY`
+
+---
+
+### 7.2 APB Interface Signals
 
 `PADDR`, `PWRITE`, `PWDATA`, `PSELx`, `PENABLE`, `PRDATA`, `PREADY`, `PSLVERR`
 
 ---
 
-## 7. Block Diagram Conventions (Industry Practice)
+## 8. Block Diagram Conventions
 
-- Multi-bit signals (address, data): **thick arrows**
-- Single-bit control signals: **thin arrows**
-- AXI channels shown as grouped interfaces
-- Clock and reset shown as global inputs
-- No bidirectional arrows for AXI or APB signals
-
----
-
-## 8. AXI vs AXI4-Lite Terminology Clarification
-
-Vendor documentation often refers to **“AXI to APB Bridge”** generically.
-
-In practice:
-- Full AXI (bursts, IDs, reordering) cannot be supported by APB
-- Implementations support **AXI4-Lite only**
-
-Therefore, the technically accurate term is:
-
-**AXI4-Lite to APB Bridge**
+- Multi-bit signals such as address and data are represented using thick arrows.  
+- Single-bit control signals are represented using thin arrows.  
+- AXI channels are grouped logically.  
+- Clock and reset are shown as global inputs to the bridge.
 
 ---
 
-## 9. Conclusion
+## 9. AXI vs AXI4-Lite Terminology Clarification
 
-The AXI4-Lite to APB bridge is a fundamental SoC infrastructure component that enables high-performance masters to access low-speed peripherals safely and efficiently. Each internal block exists to resolve a specific protocol mismatch, ensuring correctness, scalability, and full AMBA compliance.
+Although vendor documentation often refers to an “AXI to APB Bridge,” practical implementations support **AXI4-Lite only**, as full AXI features such as bursts, IDs, and out-of-order transactions are incompatible with the APB protocol.
 
 ---
 
-## 10. References
+## 10. Conclusion
+
+The AXI4-Lite to APB bridge is a critical SoC infrastructure component that enables high-performance AXI masters to access low-speed APB peripherals safely and efficiently. Each internal block resolves a specific protocol mismatch, ensuring correctness, scalability, and full compliance with AMBA standards.
+
+---
+
+## 11. References
 
 1. ARM® AMBA® AXI4-Lite Protocol Specification  
 2. ARM® AMBA® APB Protocol Specification  
 3. AMD/Xilinx LogiCORE™ AXI to APB Bridge Product Guide  
-4. ARM AMBA Bus Architecture Overview  
+4. ARM AMBA Bus Architecture Overview
+
+---
+
+
 
