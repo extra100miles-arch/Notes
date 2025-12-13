@@ -143,28 +143,13 @@ The response generator converts APB response signals into AXI4-Lite responses. I
 
 ---
 
-## 8. Block Diagram Conventions
-
-- Multi-bit signals such as address and data are represented using thick arrows.  
-- Single-bit control signals are represented using thin arrows.  
-- AXI channels are grouped logically.  
-- Clock and reset are shown as global inputs to the bridge.
-
----
-
-## 9. AXI vs AXI4-Lite Terminology Clarification
-
-Although vendor documentation often refers to an “AXI to APB Bridge,” practical implementations support **AXI4-Lite only**, as full AXI features such as bursts, IDs, and out-of-order transactions are incompatible with the APB protocol.
-
----
-
-## 10. Conclusion
+## 8. Conclusion
 
 The AXI4-Lite to APB bridge is a critical SoC infrastructure component that enables high-performance AXI masters to access low-speed APB peripherals safely and efficiently. Each internal block resolves a specific protocol mismatch, ensuring correctness, scalability, and full compliance with AMBA standards.
 
 ---
 
-## 11. References
+## 9. References
 
 1. ARM® AMBA® AXI4-Lite Protocol Specification  
 2. ARM® AMBA® APB Protocol Specification  
