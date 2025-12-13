@@ -1,0 +1,56 @@
+###########################################################################------ AXI4-Lite ⇆ APB bridge ------##################################################################################
+
+AXI4-LITE SIGNALS
+
+--- A. WRITE ADDRESS CHANNEL (AW)
+AWADDR	Master → Bridge	32	Write address
+AWPROT	Master → Bridge	3	Protection flags
+AWVALID	Master → Bridge	1	Indicates valid AWADDR
+AWREADY	Bridge → Master	1	Bridge ready
+
+
+--- B. WRITE DATA CHANNEL (W)
+WDATA	Master → Bridge	32	Write data
+WSTRB	Master → Bridge	4	Byte-enable strobes
+WVALID	Master → Bridge	1	Valid write data
+WREADY	Bridge → Master	1	Bridge ready
+
+
+--- C. WRITE RESPONSE CHANNEL (B)
+BRESP	Bridge → Master	2	Response: OKAY, SLVERR
+BVALID	Bridge → Master	1	Response valid
+BREADY	Master → Bridge	1	Response taken
+
+
+--- D. READ ADDRESS CHANNEL (AR)
+ARADDR	Master → Bridge	32
+ARPROT	Master → Bridge	3
+ARVALID	Master → Bridge	1
+ARREADY	Bridge → Master	1
+
+
+--- E. READ DATA CHANNEL (R)
+RDATA	Bridge → Master	32
+RRESP	Bridge → Master	2
+RVALID	Bridge → Master	1
+RREADY	Master → Bridge	1
+
+
+APB SIGNALS
+
+PADDR	Bridge →  SLAVE	32	
+PWRITE	Bridge →  SLAVE	 1	
+PSELx	Bridge →  SLAVE	 1	
+PENABLE	Bridge →  SLAVE	 1	
+PWDATA	Bridge →  SLAVE	 32	
+
+
+PRDATA SLAVE →  Bridge	32	
+PREADY	SLAVE →  Bridge 1	
+PSLVERR	SLAVE →  Bridge 1	
+
+
+
+
+
+
