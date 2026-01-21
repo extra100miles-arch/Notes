@@ -1,0 +1,182 @@
+DUT
+**************************************************************************************************************************************
+AXI4-Lite is a simple, memory-mapped, transaction-based protocol with decoupled address, data, and response channels.
+
+Key properties (from ARM AMBA AXI spec):
+Single-beat transfers only (no bursts)
+Separate read and write paths
+VALID / READY handshaking
+Pipelined and decoupled
+
+AXI4-Lite Handshake rule (core rule)
+A transfer happens when VALID && READY on a rising clock edge.
+And:
+VALID must stay high until READY
+Payload must stay stable while waiting
+This single rule drives all FSMs.
+
+AXI4-Lite ordering guarantees (important for bridge)
+Only one outstanding transaction per channel
+No IDs
+Responses must be in order
+
+👉 This makes AXI4-Lite bridge-friendly.
+***************************************************************************************************************************************
+APB is a simple, non-pipelined, synchronous peripheral bus with strict timing phases.
+
+Key properties (from ARM APB spec):
+One transfer at a time
+No decoupling
+Address, control, and data are phase-based
+Optional wait states using PREADY
+
+APB Transfer Phases (THIS is critical)
+🔹 SETUP phase
+PSEL = 1
+PENABLE = 0
+Address and control are driven
+
+🔹 ACCESS phase
+PSEL = 1
+PENABLE = 1
+Transfer completes when PREADY = 1
+If PREADY = 0 → wait state.
+
+| Operation | Signals                     |
+| --------- | --------------------------- |
+| Write     | `PWRITE=1`, `PWDATA` valid  |
+| Read      | `PWRITE=0`, sample `PRDATA` |
+
+***************************************************************************************************************************************
+
+| Function             | Block                           |
+| -------------------- | ------------------------------- |
+| AXI request handling | `axi_write_fsm`, `axi_read_fsm` |
+| Command packing      | FSM / `axi_cmd_pack`            |
+| Decoupling           | `cmd_fifo`                      |
+| Execution            | `apb_master_fsm`                |
+| Translation          | `response_gen`                  |
+| Integration          | `axi_apb_bridge_top`            |
+
+****************************************************************************************************************************************
+🔹 axi_write_fsm
+AXI rule it implements
+AW and W are independent
+Both must be accepted before response
+BRESP sent only after completion
+
+What this FSM does
+Waits for AWVALID && AWREADY
+Waits for WVALID && WREADY
+Stores address + data
+Emits ONE write command
+Waits for completion
+Drives BVALID/BRESP
+
+This FSM does not care about APB timing
+*******************************************************************************************************************************************
+🔹 axi_read_fsm
+AXI rule it implements
+AR accepted independently
+R response must contain data + status
+VALID/READY rules apply
+
+What this FSM does
+Accepts AR
+Emits ONE read command
+Waits for read data
+Drives RVALID/RDATA/RRESP
+*******************************************************************************************************************************************
+🔹 axi_cmd_pack (if used)
+AXI rule it implements
+AXI info arrives fragmented
+Internal logic wants atomic commands
+
+What it does
+Combines AXI pieces into one command
+This is an architectural convenience, not protocol requirement.
+*******************************************************************************************************************************************
+🔹 cmd_fifo
+Protocol problem it solves
+AXI can issue requests faster
+APB can only execute one at a time
+
+What it does
+Buffers commands
+Preserves order
+Applies backpressure
+This is where decoupling is handled
+*******************************************************************************************************************************************
+🔹 apb_master_fsm
+APB rule it implements
+SETUP → ACCESS → COMPLETE
+Wait on PREADY
+Sample PRDATA / PSLVERR
+
+What this FSM does
+Takes one command
+Drives APB signals
+Waits until done
+Produces result
+
+This FSM knows nothing about AXI
+********************************************************************************************************************************************
+🔹 apb_addr_decoder
+APB rule it implements
+Multiple slaves selected by address
+
+What it does
+Decodes address
+Generates one-hot PSELx
+********************************************************************************************************************************************
+🔹 response_gen
+Protocol rule it implements
+AXI and APB signal errors differently
+
+What it does
+Maps PSLVERR → BRESP/RRESP
+Passes PRDATA → RDATA
+*********************************************************************************************************************************************
+🔹 axi_apb_bridge_top
+What it does (architectural role)
+Connects everything
+Does NOT implement protocol logic
+Makes ownership explicit
+
+Integration happens here, not in FSMs.
+********************************************************************************************************************************************
+
+The bridge exists to resolve this mismatch
+| AXI4-Lite         | APB                 |
+| ----------------- | ------------------- |
+| Decoupled         | Strictly sequential |
+| Pipelined         | Non-pipelined       |
+| Multiple channels | Single channel      |
+| Handshake-based   | Phase-based         |
+
+*******************************************************************************************************************************************
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
