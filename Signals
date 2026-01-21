@@ -1,0 +1,286 @@
+AXI4-Lite fundamentals (quick recall)
+
+Memory-mapped
+Single beat only
+VALID/READY handshake
+Independent channels
+Slave responds after execution
+
+AXI4-Lite SIGNAL GROUPS (pins you actually use)
+WRITE CHANNELS
+| Channel            | Signals                            |
+| ------------------ | ---------------------------------- |
+| Write Address (AW) | `AWADDR, AWPROT, AWVALID, AWREADY` |
+| Write Data (W)     | `WDATA, WSTRB, WVALID, WREADY`     |
+| Write Response (B) | `BRESP, BVALID, BREADY`            |
+
+READ CHANNELS
+| Channel           | Signals                            |
+| ----------------- | ---------------------------------- |
+| Read Address (AR) | `ARADDR, ARPROT, ARVALID, ARREADY` |
+| Read Data (R)     | `RDATA, RRESP, RVALID, RREADY`     |
+
+********************************************************************************
+1️⃣ AXI4-Lite WRITE TRANSACTION (PIN-LEVEL FLOW)
+🔹 Step 1: Write Address Phase (AW channel)
+Driven by AXI master-
+AWADDR  = target address
+AWPROT  = protection info
+AWVALID = 1
+
+Slave response-
+AWREADY = 1  (when it accepts address)
+
+📌 Transfer occurs when-
+AWVALID && AWREADY
+
+🔹 Step 2: Write Data Phase (W channel)
+Driven by AXI master-
+WDATA  = data
+WSTRB  = byte enables
+WVALID = 1
+
+Slave response-
+WREADY = 1
+
+📌 Transfer occurs when-
+WVALID && WREADY
+
+🔹 Step 3: Write Response Phase (B channel)
+Driven by AXI slave (your DUT)-
+BRESP  = OKAY or SLVERR
+BVALID = 1
+
+Master responds-
+BREADY = 1
+
+📌 Transfer completes when-
+BVALID && BREADY
+
+**************************************************************************************
+2️⃣ AXI4-Lite READ TRANSACTION (PIN-LEVEL FLOW)
+🔹 Step 1: Read Address Phase (AR channel)
+Driven by AXI master-
+ARADDR  = target address
+ARPROT  = protection info
+ARVALID = 1
+
+Slave response-
+ARREADY = 1
+
+📌 Transfer occurs when-
+ARVALID && ARREADY
+
+🔹 Step 2: Read Data Phase (R channel)
+Driven by AXI slave (your DUT)-
+RDATA  = read data
+RRESP  = OKAY or SLVERR
+RVALID = 1
+
+Master response-
+RREADY = 1
+
+📌 Transfer completes when-
+RVALID && RREADY
+
+****************************************************************************************
+
+APB TRANSACTIONS (PIN-LEVEL)
+APB fundamentals
+Single master
+One transaction at a time
+Phase-based
+No VALID/READY
+Timing is strict
+
+APB SIGNALS 
+| Signal    | Meaning                |
+| --------- | ---------------------- |
+| `PADDR`   | Address                |
+| `PSEL`    | Slave select           |
+| `PENABLE` | Access phase indicator |
+| `PWRITE`  | Read/Write             |
+| `PWDATA`  | Write data             |
+| `PRDATA`  | Read data              |
+| `PREADY`  | Wait-state control     |
+| `PSLVERR` | Error indicator        |
+
+3️⃣ APB WRITE TRANSACTION 
+🔹 Phase 1: SETUP PHASE
+PSEL    = 1
+PENABLE = 0
+PADDR   = address
+PWRITE  = 1
+PWDATA  = data
+
+🔹 Phase 2: ACCESS PHASE
+PSEL    = 1
+PENABLE = 1
+If:
+PREADY = 1 → write completes
+PREADY = 0 → stay in ACCESS (wait)
+
+🔹 End of transfer
+PSEL    = 0
+PENABLE = 0
+
+4️⃣ APB READ TRANSACTION 
+🔹 Phase 1: SETUP PHASE
+PSEL    = 1
+PENABLE = 0
+PADDR   = address
+PWRITE  = 0
+
+🔹 Phase 2: ACCESS PHASE
+PSEL    = 1
+PENABLE = 1
+
+If PREADY = 1:
+PRDATA  = valid
+PSLVERR = valid
+Transfer completes.
+
+*********************************************************************************************
+AXI FSMs
+Needed because:
+Channels are independent
+Must wait for handshakes
+Must store partial information
+But timing is flexible.
+
+APB FSM
+Mandatory because:
+Protocol is phase-ordered
+Signals must change in strict sequence
+FSM states map directly to protocol phases.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
