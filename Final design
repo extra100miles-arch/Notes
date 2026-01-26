@@ -1,0 +1,38 @@
+Write Flow
+AXI AW/W
+ → axi_write_fsm
+ → axi_cmd_pack
+ → FIFO
+ → apb_master_fsm
+ → APB slave
+ → rsp_valid
+ → response_gen
+ → write_done
+ → axi_write_fsm
+ → AXI B channel
+
+Read Flow
+AXI AR
+ → axi_read_fsm
+ → axi_cmd_pack
+ → FIFO
+ → apb_master_fsm
+ → APB slave
+ → rsp_valid + rsp_rdata
+ → response_gen
+ → read_valid + read_data
+ → axi_read_fsm
+ → AXI R channel
+
+***************************************************************************************
+| Concern             | Owner        |
+| ------------------- | ------------ |
+| AXI timing          | AXI FSMs     |
+| AXI fragmentation   | cmd_pack     |
+| Ordering            | FIFO         |
+| APB timing          | APB FSM      |
+| Address decode      | Decoder      |
+| Response formatting | response_gen |
+| System policy       | Top          |
+**************************************************************************************
+
