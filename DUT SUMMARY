@@ -1,0 +1,289 @@
+DUT SUMMARY
+
+Private Technical Summary
+
+Project: AXI4-Lite to APB Bridge (SystemVerilog)
+
+1. Project Overview
+
+This project implements an AXI4-Lite to APB bridge in SystemVerilog.
+The goal was to enable an AXI master to access APB peripherals while strictly respecting both protocol specifications.
+
+AXI and APB differ fundamentally:
+
+AXI is decoupled and channel-based
+
+APB is transaction-based and sequential
+
+The core challenge was to bridge these timing models safely, without protocol violations, deadlocks, or data loss.
+
+2. Architecture Decisions
+2.1 Separation of AXI and APB Domains
+
+The architecture intentionally decouples AXI-side logic from APB-side logic using:
+
+FSMs
+
+A command packer
+
+A FIFO
+
+This prevents APB timing from directly affecting AXI handshakes and vice versa.
+
+Key principle:
+
+Never let downstream timing control upstream protocol handshakes.
+
+2.2 AXI Read and Write FSMs
+
+Separate FSMs were created for:
+
+AXI write channel
+
+AXI read channel
+
+Why FSMs were required:
+
+AXI address, data, and response channels are independent
+
+Handshakes may occur in different cycles
+
+Pulse-based logic is insufficient
+
+FSMs track transaction progress, not just signal pulses.
+
+2.3 Command Packer
+
+The command packer collects AXI handshakes and emits a single internal command.
+
+Why this block exists:
+
+AXI is channel-oriented
+
+APB is transaction-oriented
+
+A translation layer is mandatory
+
+The packer converts:
+
+AW + W → WRITE command
+
+AR → READ command
+
+Design rule followed:
+
+Handshakes are events, commands are state.
+
+2.4 FIFO (Depth = 1)
+
+A single-entry FIFO sits between AXI and APB.
+
+Why FIFO depth = 1:
+
+APB supports only one active transaction
+
+The design enforces single outstanding transaction
+
+Simplifies verification and control logic
+
+Even at depth = 1, the FIFO provides:
+
+Ordering
+
+Backpressure
+
+Clean handshaking
+
+2.5 Arbitration Strategy
+
+Arbitration is handled structurally:
+
+Write has priority over read when both are pending
+
+This avoids:
+
+Write data buffering issues
+
+Complex reordering logic
+
+The priority decision is intentional and documented, not accidental.
+
+3. Major Bugs Fixed (Critical Learnings)
+3.1 Pulse vs State Bug (Primary Issue)
+
+Problem:
+
+cmd_valid was initially generated as a combinational pulse
+
+FIFO missed the pulse if not ready
+
+Entire design stalled silently
+
+Root cause:
+
+Treating protocol events (pulses) as state
+
+Fix:
+
+Latch command validity using registers
+
+Hold cmd_valid until cmd_ready is observed
+
+Key learning:
+
+In hardware, pulses are not memory. State must be explicit.
+
+3.2 Gating AXI Capture with Internal Control
+
+Problem:
+
+AXI handshakes were initially captured only when internal enable signals were high
+
+This violated AXI protocol assumptions
+
+Fix:
+
+Capture AW/W/AR strictly on VALID && READY
+
+Internal logic must never gate protocol capture
+
+Learning:
+
+Protocols define ownership of signals — internal logic must adapt, not override.
+
+3.3 Read/Write Response Ambiguity
+
+Problem:
+
+A single response signal was triggering both read and write FSMs
+
+Fix:
+
+Explicitly tag responses with command type
+
+Route responses correctly
+
+3.4 Verification Monitor Bug (AXI Semantics)
+
+Problem:
+
+Testbench assumed AW and W handshake in the same cycle
+
+Missed valid writes
+
+Fix:
+
+Track AW and W independently in monitors
+
+Declare write handshake complete only after both are seen
+
+Learning:
+
+Verification logic must follow protocol semantics, not assumptions.
+
+4. Verification Strategy
+
+Verification was done using:
+
+Directed SystemVerilog testbench
+
+Self-checking monitors
+
+Counters and assertions
+
+Waveform inspection
+
+Key cases verified:
+
+Back-to-back writes
+
+Back-to-back reads
+
+Read-after-write
+
+AW/W separated in time
+
+Simultaneous read and write arrival
+
+Backpressure behavior
+
+The design was also synthesized for a supported FPGA device to confirm synthesizability.
+
+5. Why Certain Choices Were Made
+Single Outstanding Transaction
+
+Chosen to:
+
+Reduce complexity
+
+Avoid ID tracking
+
+Match AXI-Lite behavior
+
+Improve reliability
+
+No Burst Support
+
+Out of scope by design.
+Focus was correctness and protocol understanding, not throughput.
+
+Simple APB Slave Model
+
+Used only for verification clarity, not functional completeness.
+
+6. What I Would Improve Next
+
+If extending this design:
+
+6.1 Separate Read and Write FIFOs
+
+Prevent read starvation
+
+Improve throughput
+
+6.2 Multi-Outstanding Support
+
+Add transaction IDs
+
+Track responses independently
+
+6.3 Full UVM Verification
+
+AXI agent
+
+Scoreboard
+
+Coverage-driven verification
+
+6.4 CDC Support
+
+Add synchronizers
+
+Support independent AXI/APB clocks
+
+6.5 Parameterized APB Address Decoder
+
+Multiple slaves
+
+Configurable address map
+
+7. Final Reflection
+
+This project was not just about writing RTL.
+It was about learning:
+
+Protocol discipline
+
+State vs event distinction
+
+Debugging methodology
+
+Verification correctness
+
+Toolchain realities (synthesis, timing, constraints)
+
+Most importantly, it built confidence in handling real-world digital design problems independently.
+
+One sentence I will remember:
+
+“Protocols don’t forgive assumptions — hardware only respects state.”
