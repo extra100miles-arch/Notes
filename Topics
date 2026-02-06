@@ -1,0 +1,302 @@
+1️⃣ DIGITAL DESIGN FUNDAMENTALS (ABSOLUTE CORE)
+
+You must know these cold:
+
+Combinational vs Sequential logic
+
+Latches (how & why inferred)
+
+Flip-flops (D, JK, T – usage)
+
+Setup time, Hold time
+
+Clock skew, jitter
+
+Race conditions
+
+Glitches & hazards
+
+Fan-in / Fan-out
+
+Synchronous vs Asynchronous reset
+
+Reset deassertion issues
+
+Timing paths (reg→reg, in→reg, reg→out)
+
+Metastability (root cause + effects)
+
+Power, area, timing trade-offs (basic)
+
+2️⃣ VERILOG HDL (SYNTHESIS-CENTRIC)
+
+always vs always @*
+
+Blocking vs Non-blocking (hardware impact)
+
+Sensitivity list errors
+
+reg vs wire
+
+Implicit nets
+
+Case / casex / casez
+
+Priority vs parallel logic
+
+Full vs incomplete assignments
+
+Inferred muxes
+
+Inferred latches
+
+Generate blocks
+
+Parameterized modules
+
+Signed vs unsigned
+
+Bit-width truncation/extension
+
+X-propagation issues
+
+Simulation vs synthesis mismatch
+
+3️⃣ SYSTEMVERILOG (INTERVIEW SEPARATOR)
+
+logic vs reg
+
+always_comb / always_ff / always_latch
+
+enum (FSM usage)
+
+struct / union
+
+Packed vs unpacked arrays
+
+Dynamic arrays
+
+Queues
+
+Associative arrays
+
+Interfaces
+
+Modports
+
+Clocking blocks
+
+Mailbox & semaphore (conceptual)
+
+Randomization
+
+Constraints
+
+Functional coverage
+
+Assertions (basic SVA)
+
+Parameter passing (#())
+
+4️⃣ FSM (VERY HIGH WEIGHT)
+
+Mealy vs Moore FSM
+
+FSM coding styles (1-process / 2-process / 3-process)
+
+State encoding techniques
+
+Safe FSM design
+
+Default state handling
+
+Illegal state recovery
+
+FSM with datapath
+
+FSM timing & latency
+
+Reset behavior in FSM
+
+Synthesis implications
+
+5️⃣ FIFO (MANDATORY – DO NOT SKIP)
+Synchronous FIFO
+
+Write/read pointers
+
+Full & empty logic
+
+Almost full / almost empty
+
+Depth vs address width
+
+Corner cases
+
+Asynchronous FIFO
+
+Clock domain crossing basics
+
+Gray code pointers
+
+Pointer synchronization
+
+Full/empty detection across domains
+
+Reset synchronization
+
+MTBF concept
+
+6️⃣ CDC (CLOCK DOMAIN CROSSING)
+
+Metastability theory
+
+2-FF synchronizer
+
+Multi-bit CDC problems
+
+Pulse synchronizers
+
+Handshake synchronizers
+
+Async FIFO as CDC solution
+
+Reset as CDC signal
+
+What NOT to synchronize
+
+CDC verification concepts
+
+7️⃣ ALU & DATAPATH DESIGN
+
+ALU architecture
+
+Opcode decoding
+
+Signed vs unsigned arithmetic
+
+Overflow detection
+
+Carry propagation
+
+Combinational ALU
+
+Pipelined ALU
+
+Latency vs throughput
+
+Resource sharing
+
+Synthesis trade-offs
+
+8️⃣ TIMING & SYNTHESIS AWARENESS
+
+What synthesis does
+
+Combinational path delay
+
+Critical path
+
+Setup vs Hold analysis
+
+Why hold violations occur
+
+Multi-cycle paths (conceptual)
+
+False paths (conceptual)
+
+Timing closure idea
+
+Why RTL choices affect timing
+
+9️⃣ VERIFICATION FUNDAMENTALS (NON-UVM)
+
+Directed testing
+
+Self-checking testbench
+
+Scoreboard concepts
+
+Assertions vs test logic
+
+Functional vs code coverage
+
+Constrained random testing
+
+Debug methodology
+
+🔟 UVM (THINKING FOCUS, NOT TEMPLATE)
+
+Why UVM exists
+
+Transaction-level modeling
+
+Sequence & sequencer
+
+Driver / Monitor roles
+
+Analysis ports
+
+Scoreboard design
+
+Configuration database
+
+Factory concept
+
+Functional coverage in UVM
+
+Debugging UVM tests
+
+Reusability philosophy
+
+1️⃣1️⃣ COMMON INTERVIEW DESIGN PROBLEMS
+
+You should be ready to design on whiteboard:
+
+FIFO
+
+FSM controller
+
+Arbiter
+
+Counter with conditions
+
+Pulse generator
+
+Sequence detector
+
+Register file
+
+Simple pipeline
+
+Handshake protocol
+
+CDC data transfer
+
+1️⃣2️⃣ SOFT SKILLS (YES, REQUIRED)
+
+Requirement clarification
+
+Explaining thought process
+
+Trade-off discussion
+
+Debug explanation
+
+Clean communication
+
+Handling “I don’t know” properly
+
+➕ STRONGLY RECOMMENDED (EXTRA EDGE)
+
+Low-power basics (clock gating)
+
+DFT basics (scan, why needed)
+
+AXI / APB basics (conceptual)
+
+RTL coding guidelines
+
+Linting issues
+
+Real silicon bugs examples
