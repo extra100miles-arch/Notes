@@ -1,0 +1,17 @@
+Assignments
+\
+1. 4:1 mux – using behavioral, structural, dataflow modeling 
+2. 4:1 mux using only two 2:1 mux 
+3. Encode, decoders – generic designs for -> n:2^n vice versa 
+4. D-FF with asynchronous reset, synchronous reset 
+5. Program for D latch
+6. Program for J-K FF 
+7. Ring counter, Johnson counter 
+8. Write generalized code for Mod-N counter 
+9. Program for SIPO, PISO, generic shift register (all combinations using select lines) 
+10. Code for clock divider – even clock divider, odd clock divider (50% duty cycle) + generic design 
+11. Sequence detector – overlapping, non-overlapping using state machines 
+12. Sequence generator for - 0 -> 2 -> 3 -> 5 -> 6 -> 0 using K-map 
+13. Edge detectors – rising edge, falling edge, both edge detector - > single line or multibit data designs 
+14. Asynchronous FIFO design 
+15. Write program with function which generates even/odd parity
