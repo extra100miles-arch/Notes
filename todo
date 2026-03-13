@@ -1,0 +1,91 @@
+You should be very comfortable designing:
+FSMs (Moore/Mealy)
+Counters
+Pipelines
+Handshake protocols
+FIFOs
+Clock domain crossing basics
+
+Languages:
+Verilog
+SystemVerilog (preferred)
+
+Key concepts interviewers test:
+blocking vs non-blocking
+latch inference
+timing behavior
+reset strategies
+synthesizable coding style
+
+2️⃣ FPGA Architecture Understanding
+Many candidates know RTL but don’t understand FPGA internals.
+You should know basics of:
+LUTs
+Flip-flops
+DSP blocks
+BRAM
+routing fabric
+clocking resources
+
+Example interview question:
+“How does a multiplier map onto FPGA resources?”
+Understanding this shows hardware awareness.
+
+3️⃣ Timing & Constraints (Very Important)
+Many RTL engineers struggle here.
+You should understand:
+setup and hold time
+timing closure
+critical paths
+pipelining for timing
+multi-cycle paths
+false paths
+
+Tools used:
+Xilinx Vivado
+Intel Quartus
+
+4️⃣ Verification Mindset
+Writing RTL is only half the job.
+
+You should know how to verify designs using:
+self-checking testbenches
+assertions (SVA)
+constrained random testing
+
+Advanced verification:
+UVM
+
+But don’t rush into UVM without fundamentals.
+
+Important components:
+drivers
+monitors
+scoreboard
+coverage
+Even simple structured verification already puts you ahead of many candidates.
+
+5️⃣ Debugging Skills (Extremely Valuable)
+Good engineers are debuggers.
+
+You should know how to debug using:
+waveform analysis
+simulation logs
+assertions
+FPGA debug tools
+
+For FPGA debugging:
+Integrated Logic Analyzer (ILA)
+Chipscope / Vivado debugger
+
+Example scenario:
+“Why is FIFO empty flag wrong?”
+The interviewer wants to see your thought process.
+
+
+
+
+
+
+
+
