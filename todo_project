@@ -1,0 +1,41 @@
+I am a FPGA engineer intern working on a project involving Intel NIOS II where software controls hardware using memory-mapped registers. However, I only have access to partial system files (sopcinfo + RTL signals like nios_write, nios_address), so I want to deeply understand this concept by building a similar project using Xilinx tools.
+
+I want to build a small but practical project using:
+
+* MicroBlaze (Xilinx equivalent of NIOS II)
+* AXI4-Lite (equivalent of Avalon-MM)
+* Custom RTL IP controlled via registers
+
+My goal is:
+
+* Understand how software (C code) controls RTL signals through registers
+* Understand AXI write/read transactions clearly
+* Learn how to trace register → signal mapping in RTL
+* Gain hands-on experience useful for FPGA/SoC roles
+
+Project idea:
+A simple AXI-controlled IP where MicroBlaze writes to registers like:
+
+* enable
+* invert
+* data
+
+And RTL logic generates output based on these control signals.
+
+I want:
+
+1. Step-by-step guidance starting from Vivado project creation
+2. Explanation of AXI4-Lite interface in simple terms
+3. How to modify the auto-generated AXI IP RTL (very important)
+4. How to connect MicroBlaze + AXI IP in block design
+5. How to write C code to control registers
+6. How to debug (simulation + ILA if possible)
+7. How to structure this as a strong GitHub project
+
+Important:
+
+* Keep explanations simple and practical (like real project work)
+* Don’t skip steps assuming prior knowledge
+* Focus on understanding, not just completing steps
+
+Start from Step 1: Creating Vivado project and block design.
