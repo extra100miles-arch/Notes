@@ -1,0 +1,8 @@
+🔥 Option 1 (Simple)
+Designed and implemented an FPGA-based RGBW addressable LED controller with FSM-based serial protocol generation, supporting animation, blinking, and fading effects.
+
+🔥 Option 2 (Stronger)
+Developed an FPGA-based RGBW LED control subsystem integrating a frame sequencer, ramp generator, and blink controller with a custom FSM-based 800 kHz serial LED driver.
+
+🔥 Option 3 (Advanced)
+Designed a hardware-accelerated LED control pipeline with memory-based frame sequencing, dynamic brightness control, and a custom serial protocol engine for RGBW addressable LEDs.
