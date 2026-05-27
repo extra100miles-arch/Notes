@@ -1,0 +1,16 @@
+NEW FILES
+| File                                    | Purpose              |
+| --------------------------------------- | -------------------- |
+| rtl/controller/transaction_engine.sv    | Main transaction FSM |
+| tb/integration/transaction_engine_tb.sv | FSM verification     |
+| docs/transaction_engine_architecture.md | FSM documentation    |
+
+
+FILES TO MODIFY
+| File                   | Why                 |
+| ---------------------- | ------------------- |
+| i2c_tx_pipeline_top.sv | instantiate FSM     |
+| start_gen.sv           | connect FSM control |
+| stop_gen.sv            | connect FSM control |
+| byte_tx_engine.sv      | controlled by FSM   |
+| ack_handler.sv         | connect ACK result  |
