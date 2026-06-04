@@ -1,0 +1,74 @@
+FOUNDATIONS (MOST IMPORTANT)
+
+These build deep systems understanding.
+
+Computer Architecture
+caches
+pipelines
+branch prediction
+out-of-order execution
+superscalar CPUs
+virtual memory
+TLBs
+coherency
+Operating Systems
+processes
+threads
+scheduling
+interrupts
+context switching
+DMA
+memory management
+Networking
+
+Perfect for your OSI thinking.
+
+TCP/IP
+NICs
+packet processing
+RDMA
+kernel bypass
+SmartNICs
+Linux Systems
+mmap
+epoll
+io_uring
+device drivers
+syscalls
+INTERSECTION TOPICS (YOUR SPECIALITY)
+
+These are your signature topics.
+
+Redis vs CPU Cache
+Kafka Pipelines vs FPGA Pipelines
+REST Backpressure vs AXI Handshake
+React State vs FSM Design
+Infinite Scroll vs Hardware Streaming
+Database Indexing vs Cache Lookup
+API Latency vs Memory Latency
+Branch Prediction vs Speculative Systems
+Event Loop vs Interrupt Systems
+ADVANCED SYSTEMS TOPICS
+
+Once foundations become stronger.
+
+GPU Architecture
+warps
+SMs
+tensor cores
+memory hierarchy
+FPGA Acceleration
+streaming pipelines
+HLS
+DMA engines
+PCIe acceleration
+AI Infrastructure
+model parallelism
+inference optimization
+quantization
+memory bottlenecks
+Distributed Systems
+consistency
+replication
+scheduling
+load balancing
