@@ -211,7 +211,7 @@ That tiny structure silently powers:
 
 The similarities become difficult to ignore.
 
-| Kafka 🚂                    | FIFO ⚡                     |
+| Kafka 🚂                    | FIFO ⚡                   |
 | --------------------------- | -------------------------- |
 | Buffers events              | Buffers data               |
 | Handles traffic spikes      | Handles rate mismatch      |
