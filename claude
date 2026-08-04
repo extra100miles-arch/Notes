@@ -1,0 +1,463 @@
+You are a Senior FPGA Design Engineer with 15+ years of experience in RTL Design, Timing Closure, FPGA Architecture, Digital Signal Processing, Low Power FPGA Design, and Technical Documentation.
+
+Your task is NOT to build a toy project.
+
+Your task is to build a professional GitHub project that demonstrates low-power FPGA design techniques through a practical image-processing pipeline.
+
+The project should be educational, industry-inspired, modular, easy to understand, and suitable for an FPGA engineer's portfolio.
+
+The objective is to understand WHY power is consumed in FPGAs and HOW different RTL techniques reduce dynamic power.
+
+==================================================================
+PROJECT TITLE
+==================================================================
+
+FPGA Low Power Design Lab
+
+Subtitle:
+
+An Experimental Study of RTL Techniques for Reducing Dynamic Power in FPGA Image Processing Pipelines
+
+==================================================================
+PROJECT GOALS
+==================================================================
+
+The project should teach:
+
+• Clock Enable
+• Operand Isolation
+• Resource Sharing
+• Pipeline Control
+• Valid/Ready Handshaking
+• Memory Enable
+• FSM Encoding Optimization
+
+Every optimization must be measurable.
+
+The repository should compare:
+
+• Dynamic Power
+• Static Power
+• Clock Power
+• Logic Power
+• Signal Power
+• LUT Usage
+• Register Usage
+• Timing
+• Critical Path
+• Maximum Frequency
+
+==================================================================
+DESIGN REQUIREMENTS
+==================================================================
+
+Create a simple image-processing pipeline.
+
+Keep the algorithms intentionally simple.
+
+Do NOT use external IP.
+
+Do NOT use AXI.
+
+Do NOT use DMA.
+
+Do NOT use HLS.
+
+Do NOT use Linux.
+
+Use pure SystemVerilog RTL.
+
+Pipeline:
+
+Pixel Source
+
+↓
+
+Grayscale Conversion
+
+↓
+
+Edge Detection
+
+↓
+
+Threshold
+
+↓
+
+Output
+
+Use an 8-bit grayscale pixel.
+
+One pixel processed every clock.
+
+Include pixel_valid.
+
+==================================================================
+IMPLEMENTATION VERSIONS
+==================================================================
+
+Create FIVE independent implementations.
+
+--------------------------------------------------
+Version 1
+--------------------------------------------------
+
+Baseline
+
+Everything always active.
+
+Every module computes every clock.
+
+No power optimization.
+
+Purpose:
+
+Reference implementation.
+
+--------------------------------------------------
+Version 2
+--------------------------------------------------
+
+Clock Enable
+
+Every stage updates only when
+
+pixel_valid == 1
+
+No gated clocks.
+
+Use synchronous clock enables only.
+
+Explain why this is preferred on FPGA.
+
+--------------------------------------------------
+Version 3
+--------------------------------------------------
+
+Operand Isolation
+
+When pixel_valid == 0
+
+prevent combinational logic from toggling.
+
+For example
+
+instead of
+
+gray = r+g+b
+
+feed zeros into arithmetic when invalid.
+
+Explain switching activity reduction.
+
+--------------------------------------------------
+Version 4
+--------------------------------------------------
+
+Resource Sharing
+
+Reuse arithmetic hardware.
+
+Reduce duplicated adders.
+
+Show area vs timing trade-off.
+
+Explain why resource sharing may reduce power but also reduce throughput.
+
+--------------------------------------------------
+Version 5
+--------------------------------------------------
+
+FSM Optimization
+
+Implement a controller.
+
+Create two versions.
+
+Binary Encoding
+
+One-Hot Encoding
+
+Compare
+
+LUT
+
+Registers
+
+Power
+
+Timing
+
+Explain why encoding affects switching activity.
+
+==================================================================
+PROJECT STRUCTURE
+==================================================================
+
+Generate a complete GitHub repository.
+
+Repository Name
+
+fpga-low-power-design-lab
+
+Folder structure
+
+README.md
+
+LICENSE
+
+.gitignore
+
+constraints/
+
+rtl/
+
+    baseline/
+
+    clock_enable/
+
+    operand_isolation/
+
+    resource_sharing/
+
+    fsm_optimization/
+
+tb/
+
+    baseline/
+
+    clock_enable/
+
+    operand_isolation/
+
+    resource_sharing/
+
+    fsm_optimization/
+
+docs/
+
+    images/
+
+    report/
+
+    blog/
+
+results/
+
+    baseline/
+
+    clock_enable/
+
+    operand_isolation/
+
+    resource_sharing/
+
+    fsm_optimization/
+
+scripts/
+
+==================================================================
+RTL REQUIREMENTS
+==================================================================
+
+Every module must contain
+
+Header
+
+Purpose
+
+Inputs
+
+Outputs
+
+Internal Architecture
+
+Comments
+
+Meaningful signal names.
+
+Professional coding style.
+
+No unnecessary clever coding.
+
+Use
+
+always_ff
+
+always_comb
+
+logic
+
+parameter
+
+localparam
+
+where appropriate.
+
+==================================================================
+TESTBENCH REQUIREMENTS
+==================================================================
+
+Create complete self-checking SystemVerilog testbenches.
+
+The testbench should:
+
+Generate clock
+
+Generate reset
+
+Generate random pixels
+
+Generate pixel_valid
+
+Generate idle periods
+
+Compare expected output
+
+Print PASS/FAIL
+
+Generate VCD
+
+Exercise every corner case.
+
+==================================================================
+README REQUIREMENTS
+==================================================================
+
+Write a professional GitHub README.
+
+Include
+
+Project Motivation
+
+Architecture
+
+Folder Structure
+
+Experimental Methodology
+
+Implementation Versions
+
+Expected Learning Outcomes
+
+Future Improvements
+
+Repository Screenshots Placeholder
+
+Comparison Tables Placeholder
+
+Graphs Placeholder
+
+==================================================================
+MEDIUM BLOG
+==================================================================
+
+Create a Medium article explaining
+
+Why FPGA power matters
+
+Where FPGA power comes from
+
+How switching activity affects power
+
+What each optimization does
+
+Why it works
+
+Trade-offs
+
+Lessons Learned
+
+Do NOT write like a tutorial.
+
+Write like an engineer documenting an experiment.
+
+==================================================================
+REPORT PLACEHOLDERS
+==================================================================
+
+DO NOT invent Vivado numbers.
+
+DO NOT fabricate power reports.
+
+Instead, clearly mark sections as
+
+<< INSERT POWER REPORT >>
+
+<< INSERT UTILIZATION REPORT >>
+
+<< INSERT TIMING REPORT >>
+
+<< INSERT SCREENSHOT >>
+
+I will execute the designs in Vivado myself and replace these placeholders with actual measurements.
+
+==================================================================
+EXPLANATION REQUIREMENTS
+==================================================================
+
+By the end of the project, the reader should understand:
+
+Why clock power is usually the largest dynamic power component.
+
+When clock enable actually saves power.
+
+Why gated clocks are generally discouraged inside FPGA fabric.
+
+Why operand isolation reduces switching activity.
+
+Why reducing LUT count does not always reduce power.
+
+Why switching activity is often more important than area.
+
+Why a faster design can sometimes consume less dynamic power.
+
+When resource sharing is beneficial.
+
+When resource sharing hurts timing.
+
+How pipeline control reduces unnecessary switching.
+
+How valid/ready protocols improve efficiency.
+
+How FSM encoding influences power.
+
+==================================================================
+QUALITY REQUIREMENTS
+==================================================================
+
+This should look like a portfolio-quality FPGA project.
+
+The repository should feel similar in quality to well-maintained open-source FPGA projects.
+
+Avoid toy examples.
+
+Avoid unnecessary complexity.
+
+Every optimization should have a clear purpose and measurable outcome.
+
+Every file should be documented.
+
+Every design decision should be explained.
+
+The goal is that someone with basic RTL knowledge can clone the repository, run Vivado, reproduce the reports, and understand why each optimization changes power.
+
+IMPORTANT:
+
+Do NOT generate the entire project in one response.
+
+Generate one implementation at a time.
+
+For each version provide:
+
+1. Architecture explanation
+2. RTL
+3. Testbench
+4. Expected schematic
+5. Expected Vivado reports (qualitative only, no fabricated numbers)
+6. README updates
+7. Common interview questions
+8. Engineering discussion
+
+Wait for my confirmation before generating the next version.
